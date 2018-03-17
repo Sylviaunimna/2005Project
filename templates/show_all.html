@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head></head>
+   <body>
+        <h3>
+            <a href = "{{ url_for('show_all') }}">Group Project</a><br><br><br>
+        </h3>
+      {% if not session.logged_in %}
+          <h3>
+
+             <a href = "{{ url_for('login') }}">Login     </a>
+             <a href = "{{ url_for('register') }}">Register</a>
+          </h3>
+      {% endif %}
+      <hr/>
+      {%- for message in get_flashed_messages() %}
+         {{ message }}
+      {%- endfor %}
+
+      <h3>Posts (<a href = "{{ url_for('new') }}">Add Post
+         </a>)</h3>
+
+      <table border="1">
+         <thead>
+            <tr>
+               <th>Title</th>
+               <th>Author</th>
+               <th>Content</th>
+               <th>Topic</th>
+            </tr>
+         </thead>
+
+         <tbody>
+            {% for post in posts %}
+               <tr>
+                  <td>{{ post.title }}</td>
+                  <td>{{ post.author }}</td>
+                  <td>{{ post.content }}</td>
+                    <td>{{ post.topic }}</td>
+                  <td><a href = {{ url_for('replyto', post_id = post.postID) }}> Reply </a></td>
+                  <td><a href = {{ url_for('show_replies', post_id = post.postID) }}> Replies ({{ post.replies }}) </a></td>
+               </tr>
+            {% endfor %}
+
+         </tbody>
+      </table>
+
+
+      <table>
+         <thead>
+            <tr>
+               <th>Users</th>
+            </tr>
+         </thead>
+
+         <tbody>
+            {% for user in users %}
+               <tr>
+                  <td>{{ user.username }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+      {% if session.logged_in %}
+        <a href = "{{ url_for('logout') }}">Logout     </a>
+      {% endif %}
+   </body>
+</html>
