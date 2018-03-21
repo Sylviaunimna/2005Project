@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+   <body>
+
+      <h3>Message Board</h3>
+      <hr/>
+
+      {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {%- endfor %}
+
+      <h3>Posts (<a href = "{{ url_for('new') }}">Add Post
+         </a>)</h3>
+
+      <form action = "{{ request.path }}" method = "post">
+         <label for = "title">Post Title</label><br>
+         <input type = "text" name = "title" placeholder = "Post Title" /><br>
+         <label for = "content">Content</label><br>
+         <input type = "text" name = "content" placeholder = "Post Content" /><br>
+         <label for = "topic">Topic</label><br>
+         <input type = "text" name = "topic" placeholder = "General" /><br>
+         <input type = "submit" value = "Submit" />
+      </form>
+
+   </body>
+</html>
