@@ -1,0 +1,17 @@
+<html lang = "en">
+   <head>Hello, Main Page</head>
+   <body>
+	<div>Main: 
+		<a href="/">Home</a>
+		{% if not session.logged_in %}		
+			<a href="/register">Register</a>
+			<a href="/login">Login</a>
+		{% endif %}
+			<a href="/group">Group discussion</a>
+		{% if session.logged_in %}	
+			<a href="/logout">Log out</a>
+		{% endif %}
+        </div>
+	{% block content %}{% endblock %}
+  </body>
+</html>
