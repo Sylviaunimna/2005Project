@@ -21,6 +21,7 @@ class User(db.Model):
         :type password: String
         :return: Returns null by default upon function success.
     """
+    
     __tablename__ = 'user'
     id = db.Column('id', db.Integer, primary_key=True)
     username = db.Column('username', db.String(15))
