@@ -93,11 +93,14 @@ def login():
                     session['logged_in'] = True
                     flash('You were logged in as ' + session['username'])
                     return redirect(url_for('show_all'))
+            
             else:
                 flash('Incorrect Username and/or Password')
                 return redirect(url_for('login'))
+       
         else:
-            return redirect(url_for('logout'))
+            flash('Incorrect Username and/or Password')
+            return render_template('login.html')
     return render_template('login.html', error=error)
 
 
@@ -106,7 +109,8 @@ def register():
     error = None
     if request.method == 'POST':
         if not request.form['username'] or not request.form['password']:
-            flash('Please enter all the fields', 'error')
+            flash('Please enter all the fields')
+            render_template('register.html')
         else:
             loginuser = User.query.filter_by(username=request.form['username']).first()
             if not loginuser:
@@ -127,6 +131,10 @@ def logout():
     session.pop('username', None)
     flash('You were logged out')
     return redirect(url_for('show_all'))
+
+@app.route('/group')
+def group():
+    return render_template('group.html')
 
 
 db.create_all()
