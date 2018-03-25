@@ -3,10 +3,11 @@
 from flask import Flask, request, flash, url_for, redirect, render_template, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
+from sqlalchemy import and_
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test008.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test016.sqlite3'
 app.config['SECRET_KEY'] = "random string"
 db = SQLAlchemy(app)
 
@@ -27,6 +28,7 @@ class User(db.Model):
     id = db.Column('id', db.Integer, primary_key=True)
     username = db.Column('username', db.String(15))
     password = db.Column('password', db.String(10))
+    subscriptions = db.relationship('Subscription', backref='user', lazy=True)
 
     def __init__(self, username, password):
         self.username = username
@@ -60,6 +62,7 @@ class Post(db.Model):
     topic = db.Column(db.String(20))
     author = db.Column(db.String(15))
     replies = db.Column('replies', db.Integer)
+    subscriptions = db.relationship('Subscription', backref='post', lazy=True)
 
     def __init__(self, title, content, topic, replyID = 0):
         self.replyID = replyID
@@ -72,6 +75,23 @@ class Post(db.Model):
         else:
             self.author = "Anonymous"
 
+class Subscription(db.Model):
+
+    __tablename__ = 'subscription'
+    subID = db.Column('sub_id', db.Integer, primary_key=True)
+    userID = db.Column(db.String(15), db.ForeignKey('user.id'), nullable=False)
+    topic = db.Column('topic', db.String(20))
+    postID = db.Column(db.Integer, db.ForeignKey('post.post_id'), nullable=False)
+    postTitle = db.Column('postTitle', db.String(100))
+    notification = db.Column('notification', db.Boolean)
+
+    def __init__(self, user, topic, postID = 0):
+        self.userID = user
+        self.topic = topic
+        self.postID = postID
+        if postID is not 0:
+            self.postTitle = Post.query.filter_by(postID=postID).first().title
+        self.notification = False
 
 @app.route('/new', methods=['GET', 'POST'])
 def new():
@@ -84,6 +104,9 @@ def new():
             flash('Please enter all the fields', 'error')
         else:
             post = Post(request.form['title'], request.form['content'], request.form['topic'])
+            subs = Subscription.query.filter(Subscription.topic == request.form['topic'])
+            for sub in subs:
+                sub.notification = True
             db.session.add(post)
             db.session.commit()
             flash('Record was successfully added')
@@ -106,13 +129,43 @@ def replyto(post_id):
         else:
             replyto = Post.query.filter_by(postID = post_id).first()
             replyto.replies = replyto.replies + 1
+            subs = Subscription.query.filter(Subscription.postID == post_id)
+            for sub in subs:
+                sub.notification = True
             post = Post("Reply", request.form['content'], replyto.topic, post_id)
             db.session.add(post)
             db.session.commit()
             flash('Record was successfully added')
             return redirect(url_for('show_all'))
-    return render_template('reply.html')
+    return render_template('reply.html', posts=Post.query.filter(or_(Post.replyID == post_id, Post.postID == post_id)))
 
+@app.route('/subscribetotopic/<topic>')
+def subscribetotopic(topic):
+
+    sub = Subscription(session['username'], topic)
+    db.session.add(sub)
+    db.session.commit()
+    flash(str(session['username']) + " subscribed to topic " + topic)
+    return render_template('show_all.html')
+
+@app.route('/subscribetopost/<int:post_id>')
+def subscribetopost(post_id):
+
+    sub = Subscription(session['username'], None, post_id)
+    db.session.add(sub)
+    db.session.commit()
+    flash(str(session['username']) + " subscribed to post " + str(post_id))
+    return render_template('show_all.html')
+
+@app.route('/mysubs')
+def showSubs():
+    sub1 = Subscription.query.filter(and_(Subscription.userID == session['username'], Subscription.postID == 0))
+    sub2 = db.session.query(Subscription).filter(
+        and_(Subscription.userID == session['username'], (Subscription.topic == None)))
+    subs = Subscription.query.filter(Subscription.userID == session['username'])
+    for sub in subs:
+        sub.notification = False
+    return render_template('mysubs.html', subTopics = sub1, subPosts = sub2)
 
 @app.route('/')
 def show_all():
@@ -121,18 +174,6 @@ def show_all():
     :return: Returns the HTML template 'show_all.html'.
     """
     return render_template('show_all.html', users=User.query.all(), posts=Post.query.filter(Post.replyID == 0))
-
-
-@app.route('/replies/<int:post_id>')
-def show_replies(post_id):
-    """Shows the content of the replies that are referring to the original post.
-
-    :param post_id: The ID number of the original post that the replies are referencing.
-    :type post_id: Integer
-    :return: Returns the HTML template 'show_all.html' with the replies included.
-    """
-    return render_template('show_all.html', users=User.query.all(), posts=Post.query.filter(or_(Post.replyID == post_id, Post.postID == post_id)))
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
