@@ -76,6 +76,9 @@ class Post(db.Model):
             self.author = "Anonymous"
 
 class Subscription(db.Model):
+    """This is a placeholder doc string
+
+    """
 
     __tablename__ = 'subscription'
     subID = db.Column('sub_id', db.Integer, primary_key=True)
@@ -92,6 +95,26 @@ class Subscription(db.Model):
         if postID is not 0:
             self.postTitle = Post.query.filter_by(postID=postID).first().title
         self.notification = False
+
+# class Groups(db.Model):
+#    """This is a placeholder doc string
+#
+#    """
+#
+#    __tablename__ = 'groups'
+#    groupID = db.Column('group_id', db.Integer, primary_key=True)
+#    userID = db.Column(db.String(15), db.ForeignKey('user.id'), nullable=False)
+#    group_name = db.Column('group_name', db.String(20))
+#
+#    def __init__(self, group_name, userID, groupID = 0):
+#        self.group_name = group_name
+#        self.userID = userID
+#        self.groupID = groupID
+#        if session.get('username'):
+#            self.author = session['username']
+#        else:
+#            self.author = "Anonymous"
+
 
 @app.route('/new', methods=['GET', 'POST'])
 def new():
@@ -141,6 +164,12 @@ def replyto(post_id):
 
 @app.route('/subscribetotopic/<topic>')
 def subscribetotopic(topic):
+    """Subscribes the user to their selected topic keyword.
+
+    :param topic: The topic name to be referenced when checking for notifications.
+    :type topic: String
+    :return: Returns the HTML template 'show_all.html'.
+    """
 
     sub = Subscription(session['username'], topic)
     db.session.add(sub)
@@ -150,6 +179,12 @@ def subscribetotopic(topic):
 
 @app.route('/subscribetopost/<int:post_id>')
 def subscribetopost(post_id):
+    """Subscribes the user to their selected post keyword.
+
+    :param post_id: The post id to be referenced when checking for notifications.
+    :type post_id: Integer
+    :return: Returns the HTML template 'show_all.html'.
+    """
 
     sub = Subscription(session['username'], None, post_id)
     db.session.add(sub)
@@ -159,6 +194,11 @@ def subscribetopost(post_id):
 
 @app.route('/mysubs')
 def showSubs():
+    """Generates a list of all subscriptions that a user has made.
+
+    :return: Returns the HTML template 'mysubs.html'.
+    """
+
     sub1 = Subscription.query.filter(and_(Subscription.userID == session['username'], Subscription.postID == 0))
     sub2 = db.session.query(Subscription).filter(
         and_(Subscription.userID == session['username'], (Subscription.topic == None)))
@@ -196,7 +236,8 @@ def login():
                 flash('Incorrect Username and/or Password')
                 return redirect(url_for('login'))
         else:
-            return redirect(url_for('logout'))
+            flash('Incorrect Username and/or Password')
+            return render_template('login.html')
     return render_template('login.html', error=error)
 
 
@@ -211,7 +252,8 @@ def register():
     error = None
     if request.method == 'POST':
         if not request.form['username'] or not request.form['password']:
-            flash('Please enter all the fields', 'error')
+            flash('Please enter all the fields')
+            render_template('register.html')
         else:
             loginuser = User.query.filter_by(username=request.form['username']).first()
             if not loginuser:
@@ -237,6 +279,13 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('show_all'))
 
+@app.route('/group')
+def create_group():
+    """This is the stub for the create a group function.
+
+    :return:
+    """
+    return render_template('group.html')
 
 db.create_all()
 if __name__ == '__main__':
