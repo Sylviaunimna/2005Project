@@ -1,20 +1,6 @@
-<!DOCTYPE html>
-<html lang = "en">
-   <head></head>
-   <body>
-        <h3>
-            <a href = "{{ url_for('show_all') }}">Group Project</a><br><br><br>
-        </h3>
-      {% if not session.logged_in %}
-          <h3>
+{% extends "layout.html" %}
 
-             <a href = "{{ url_for('login') }}">Login     </a>
-             <a href = "{{ url_for('register') }}">Register</a>
-          </h3>
-      {% endif %}
-        {% if session.logged_in %}
-        <a href = "{{ url_for('showSubs') }}">My Subscriptions     </a>
-      {% endif %}
+{% block content %}
       <hr/>
       {%- for message in get_flashed_messages() %}
          {{ message }}
@@ -40,9 +26,8 @@
                   <td>{{ post.author }}</td>
                   <td>{{ post.content }}</td>
                     <td>{{ post.topic }}</td>
-                  <td><a href = {{ url_for('replyto', post_id = post.postID) }}> Replies ({{ post.replies }}) </a></td>
-                   <td><a href = {{ url_for('subscribetotopic', topic = post.topic) }}>Subscribe to Topic</a></td>
-                   <td><a href = {{ url_for('subscribetopost', post_id = post.postID) }}>Subscribe to Post</a></td>
+                  <td><a href = {{ url_for('replyto', post_id = post.postID) }}> Reply </a></td>
+                  <td><a href = {{ url_for('show_replies', post_id = post.postID) }}> Replies ({{ post.replies }}) </a></td>
                </tr>
             {% endfor %}
 
@@ -65,8 +50,5 @@
             {% endfor %}
          </tbody>
       </table>
-      {% if session.logged_in %}
-        <a href = "{{ url_for('logout') }}">Logout     </a>
-      {% endif %}
-   </body>
-</html>
+{% endblock %}
+ 
