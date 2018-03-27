@@ -2,7 +2,9 @@
 <html>
    <body>
 
-      <h3>Message Board</h3>
+      <h3>
+            <a href = "{{ url_for('show_all') }}">Board Index</a><br><br><br>
+        </h3>
       <hr/>
 
       {%- for category, message in get_flashed_messages(with_categories = true) %}

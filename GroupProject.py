@@ -7,7 +7,7 @@ from sqlalchemy import and_
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test016.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test018.sqlite3'
 app.config['SECRET_KEY'] = "random string"
 db = SQLAlchemy(app)
 
@@ -123,7 +123,9 @@ def new():
     :return: Returns the HTML template 'new.html'.
     """
     if request.method == 'POST':
-        if not request.form['title' ] or not request.form['content']:
+        if session.get('username') is None:
+            flash('Error: Must be logged in to post')
+        elif not request.form['title' ] or not request.form['content']:
             flash('Please enter all the fields', 'error')
         else:
             post = Post(request.form['title'], request.form['content'], request.form['topic'])
@@ -147,12 +149,14 @@ def replyto(post_id):
     """
 
     if request.method == 'POST':
-        if not request.form['content']:
+        if session.get('username') is None:
+            flash('Error: Must be logged in to post')
+        elif not request.form['content']:
             flash('Please enter a reply between 1 and 250 characters', 'error')
         else:
             replyto = Post.query.filter_by(postID = post_id).first()
             replyto.replies = replyto.replies + 1
-            subs = Subscription.query.filter(Subscription.postID == post_id)
+            subs = Subscription.query.filter(or_(Subscription.postID == post_id,Subscription.topic == replyto.topic))
             for sub in subs:
                 sub.notification = True
             post = Post("Reply", request.form['content'], replyto.topic, post_id)
@@ -170,12 +174,16 @@ def subscribetotopic(topic):
     :type topic: String
     :return: Returns the HTML template 'show_all.html'.
     """
-
-    sub = Subscription(session['username'], topic)
-    db.session.add(sub)
-    db.session.commit()
-    flash(str(session['username']) + " subscribed to topic " + topic)
-    return render_template('show_all.html')
+    if session.get('username') is None:
+        flash('Error: Must be logged in to subscribe')
+    elif Subscription.query.filter(and_(Subscription.topic == topic, Subscription.userID == session['username'])).first() is None:
+        sub = Subscription(session['username'], topic)
+        db.session.add(sub)
+        db.session.commit()
+        flash(str(session['username']) + " subscribed to topic " + topic)
+    else:
+        flash("You're already subscribed to topic " + topic)
+    return redirect(url_for('show_all'))
 
 @app.route('/subscribetopost/<int:post_id>')
 def subscribetopost(post_id):
@@ -186,11 +194,16 @@ def subscribetopost(post_id):
     :return: Returns the HTML template 'show_all.html'.
     """
 
-    sub = Subscription(session['username'], None, post_id)
-    db.session.add(sub)
-    db.session.commit()
-    flash(str(session['username']) + " subscribed to post " + str(post_id))
-    return render_template('show_all.html')
+    if session.get('username') is None:
+        flash('Error: Must be logged in to subscribe')
+    elif Subscription.query.filter(and_(Subscription.postID == post_id, Subscription.userID == session['username'])).first() is None:
+        sub = Subscription(session['username'], None, post_id)
+        db.session.add(sub)
+        db.session.commit()
+        flash(str(session['username']) + " subscribed to post " + str(post_id))
+    else:
+        flash("You're already subscribed to post " + str(post_id))
+    return redirect(url_for('show_all'))
 
 @app.route('/mysubs')
 def showSubs():
@@ -198,14 +211,19 @@ def showSubs():
 
     :return: Returns the HTML template 'mysubs.html'.
     """
+    if session.get('username') is None:
+        flash('Error: Must be logged in to view subscriptions')
+    else:
+        subs = Subscription.query.filter(Subscription.userID == session['username'])
+        x = render_template('mysubs.html', subTopics=Subscription.query.filter(and_(Subscription.userID == session['username'], Subscription.postID == 0)), subPosts=db.session.query(Subscription).filter(and_(Subscription.userID == session['username'], (Subscription.topic == None))))
+        for sub in subs:
+            sub.notification = False
+        db.session.commit()
+        return x
 
-    sub1 = Subscription.query.filter(and_(Subscription.userID == session['username'], Subscription.postID == 0))
-    sub2 = db.session.query(Subscription).filter(
-        and_(Subscription.userID == session['username'], (Subscription.topic == None)))
-    subs = Subscription.query.filter(Subscription.userID == session['username'])
-    for sub in subs:
-        sub.notification = False
-    return render_template('mysubs.html', subTopics = sub1, subPosts = sub2)
+@app.route('/topic/<topic>')
+def showTopic(topic):
+    return render_template('show_all.html', posts=Post.query.filter(and_(Post.replyID == 0, Post.topic == topic)))
 
 @app.route('/')
 def show_all():
@@ -213,7 +231,7 @@ def show_all():
 
     :return: Returns the HTML template 'show_all.html'.
     """
-    return render_template('show_all.html', users=User.query.all(), posts=Post.query.filter(Post.replyID == 0))
+    return render_template('show_all.html', posts=Post.query.filter(Post.replyID == 0))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
