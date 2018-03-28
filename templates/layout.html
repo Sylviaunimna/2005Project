@@ -1,5 +1,6 @@
 <html lang = "en">
-   <head>Hello, Main Page</head>
+	<head>Hello, this is main page</head>
+	
    <body>
 	<div>Main: 
 		<a href="/">Home</a>
@@ -7,10 +8,14 @@
 			<a href="/register">Register</a>
 			<a href="/login">Login</a>
 		{% endif %}
-			<a href="/group">Group discussion</a>
 		{% if session.logged_in %}	
 			<a href="/logout">Log out</a>
-		{% endif %}
+		{% endif %}		
+			<a href="/group">Group discussion</a>
+		
+		{% if session.logged_in %}
+			<a href="/mysubs">My subscription</a>
+		{% endif %}		
         </div>
 	{% block content %}{% endblock %}
   </body>

@@ -126,7 +126,9 @@ def new():
         if session.get('username') is None:
             flash('Error: Must be logged in to post')
         elif not request.form['title' ] or not request.form['content']:
+
             flash('Please enter all the fields', 'error')
+
         else:
             post = Post(request.form['title'], request.form['content'], request.form['topic'])
             subs = Subscription.query.filter(Subscription.topic == request.form['topic'])
@@ -249,7 +251,9 @@ def login():
                     session['username'] = request.form['username']
                     session['logged_in'] = True
                     flash('You were logged in as ' + session['username'])
+
                     return redirect(url_for('show_all'))
+
             else:
                 flash('Incorrect Username and/or Password')
                 return redirect(url_for('login'))

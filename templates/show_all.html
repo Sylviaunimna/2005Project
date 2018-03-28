@@ -1,29 +1,15 @@
-<!DOCTYPE html>
-<html lang = "en">
-   <head></head>
-   <body>
-        <h3>
-            <a href = "{{ url_for('show_all') }}">Group Project</a><br><br><br>
-        </h3>
-      {% if not session.logged_in %}
-          <h3>
+{% extends "layout.html" %}
 
-             <a href = "{{ url_for('login') }}">Login     </a>
-             <a href = "{{ url_for('register') }}">Register</a>
-          </h3>
-      {% endif %}
-        {% if session.logged_in %}
-        <a href = "{{ url_for('showSubs') }}">My Subscriptions     </a>
-      {% endif %}
+{% block content %}
+
       <hr/>
       {%- for message in get_flashed_messages() %}
          {{ message }}
       {%- endfor %}
 
-      <h3>Posts (<a href = "{{ url_for('new') }}">Add Post
-         </a>)</h3>
+      <h3>Posts (<a href = "{{ url_for('new') }}">Add Post</a>)</h3>
 
-      <table border="1">
+     <table border="1">
          <thead>
             <tr>
                <th>Title</th>
@@ -50,8 +36,7 @@
       </table>
 
 
-      {% if session.logged_in %}
-        <a href = "{{ url_for('logout') }}">Logout     </a>
-      {% endif %}
-   </body>
-</html>
+
+{% endblock %}
+ 
+

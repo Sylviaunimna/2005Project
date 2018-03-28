@@ -1,4 +1,8 @@
-{% block body %}
+
+{% extends "layout.html" %}
+
+{% block content %}
+
   <h2>Register</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
           {%- for message in get_flashed_messages() %}
@@ -10,6 +14,10 @@
       <dd><input type=text name=username>
       <dt>New Password:
       <dd><input type=text name=password>
+	<hr/>
+      {%- for message in get_flashed_messages() %}
+        <span style="color: red;">{{ message }}</span> 
+      {%- endfor %}
       <dd><input type=submit value=Register>
     </dl>
   </form>

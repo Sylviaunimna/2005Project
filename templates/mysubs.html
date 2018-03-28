@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html lang = "en">
-   <head></head>
-   <body>
-        <h3>
-            <a href = "{{ url_for('show_all') }}">Board Index</a><br><br><br>
-        </h3>
+
+{% block content %}
+	<h3>My subscription</h3>
+
 
       <table border="1">
          <thead>
@@ -42,8 +39,6 @@
          </tbody>
       </table>
 
-      {% if session.logged_in %}
-        <a href = "{{ url_for('logout') }}">Logout     </a>
-      {% endif %}
-   </body>
-</html>
+
+{% endblock %}
+
