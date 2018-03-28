@@ -17,7 +17,7 @@
          <tbody>
             {% for sub1 in subTopics %}
                <tr>
-               <td>{{  sub1.topic  }}</td>
+               <td><a href = {{ url_for('showTopic', topic = sub1.topic) }}>{{  sub1.topic  }}</a></td>
                <td>{{  sub1.notification  }}</td>
                </tr>
             {% endfor %}
@@ -35,9 +35,8 @@
          <tbody>
             {% for sub2 in subPosts %}
                <tr>
-               <td>{{  sub2.postTitle  }}</td>
+               <td><a href = {{ url_for('replyto', post_id = sub2.postID) }}>{{  sub2.postTitle  }}</a></td>
                <td>{{  sub2.notification  }}</td>
-               <td><a href = {{ url_for('replyto', post_id = sub2.postID) }}> Go to thread </a></td>
                </tr>
             {% endfor %}
          </tbody>

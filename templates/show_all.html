@@ -39,7 +39,7 @@
                   <td>{{ post.title }}</td>
                   <td>{{ post.author }}</td>
                   <td>{{ post.content }}</td>
-                    <td>{{ post.topic }}</td>
+                    <td><a href = {{ url_for('showTopic', topic = post.topic) }}> {{ post.topic }} </a></td>
                   <td><a href = {{ url_for('replyto', post_id = post.postID) }}> Replies ({{ post.replies }}) </a></td>
                    <td><a href = {{ url_for('subscribetotopic', topic = post.topic) }}>Subscribe to Topic</a></td>
                    <td><a href = {{ url_for('subscribetopost', post_id = post.postID) }}>Subscribe to Post</a></td>
@@ -50,21 +50,6 @@
       </table>
 
 
-      <table>
-         <thead>
-            <tr>
-               <th>Users</th>
-            </tr>
-         </thead>
-
-         <tbody>
-            {% for user in users %}
-               <tr>
-                  <td>{{ user.username }}</td>
-               </tr>
-            {% endfor %}
-         </tbody>
-      </table>
       {% if session.logged_in %}
         <a href = "{{ url_for('logout') }}">Logout     </a>
       {% endif %}
