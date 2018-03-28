@@ -1,24 +1,35 @@
-<!DOCTYPE html>
-<html>
-   <body>
+{% extends "layout.html" %}
 
-      <h3>Message Board</h3>
-      <hr/>
+{% block content %}
+     
 
-      {%- for category, message in get_flashed_messages(with_categories = true) %}
-         <div class = "alert alert-danger">
-            {{ message }}
-         </div>
-      {%- endfor %}
+      <table border="1">
+         <thead>
+            <tr>
+               <th>Author</th>
+               <th>Content</th>
+            </tr>
+         </thead>
 
-      <h3>Posts (<a href = "{{ url_for('new') }}">New Post
-         </a>)</h3>
+         <tbody>
+            {% for post in posts %}
+               <tr>
+                  <td>{{ post.author }}</td>
+                  <td>{{ post.content }}</td>
+               </tr>
+            {% endfor %}
+
+         </tbody>
+      </table>
 
       <form action = "{{ request.path }}" method = "post">
          <label for = "content">Content</label><br>
          <input type = "text" name = "content" placeholder = "Post Content" /><br>
          <input type = "submit" value = "Submit" />
       </form>
-
-   </body>
-</html>
+	{%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            <span style="color: red;">{{ message }}</span>
+         </div>
+      {%- endfor %}
+{% endblock %}

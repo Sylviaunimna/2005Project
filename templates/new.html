@@ -1,16 +1,5 @@
-<!DOCTYPE html>
-<html>
-   <body>
-
-      <h3>Message Board</h3>
-      <hr/>
-
-      {%- for category, message in get_flashed_messages(with_categories = true) %}
-         <div class = "alert alert-danger">
-            {{ message }}
-         </div>
-      {%- endfor %}
-
+{% extends "layout.html" %}
+{% block content %}
       <h3>Posts (<a href = "{{ url_for('new') }}">Add Post
          </a>)</h3>
 
@@ -24,5 +13,9 @@
          <input type = "submit" value = "Submit" />
       </form>
 
-   </body>
-</html>
+	{%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            <span style="color: red;">{{ message }}</span>
+         </div>
+      {%- endfor %}
+{% endblock %}

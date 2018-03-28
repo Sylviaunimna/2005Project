@@ -6,10 +6,9 @@
          {{ message }}
       {%- endfor %}
 
-      <h3>Posts (<a href = "{{ url_for('new') }}">Add Post
-         </a>)</h3>
+      <h3>Posts (<a href = "{{ url_for('new') }}">Add Post</a>)</h3>
 
-      <table border="1">
+     <table border="1">
          <thead>
             <tr>
                <th>Title</th>
@@ -25,9 +24,10 @@
                   <td>{{ post.title }}</td>
                   <td>{{ post.author }}</td>
                   <td>{{ post.content }}</td>
-                    <td>{{ post.topic }}</td>
-                  <td><a href = {{ url_for('replyto', post_id = post.postID) }}> Reply </a></td>
-                  <td><a href = {{ url_for('show_replies', post_id = post.postID) }}> Replies ({{ post.replies }}) </a></td>
+                    <td><a href = {{ url_for('showTopic', topic = post.topic) }}> {{ post.topic }} </a></td>
+                  <td><a href = {{ url_for('replyto', post_id = post.postID) }}> Replies ({{ post.replies }}) </a></td>
+                   <td><a href = {{ url_for('subscribetotopic', topic = post.topic) }}>Subscribe to Topic</a></td>
+                   <td><a href = {{ url_for('subscribetopost', post_id = post.postID) }}>Subscribe to Post</a></td>
                </tr>
             {% endfor %}
 
@@ -35,20 +35,6 @@
       </table>
 
 
-      <table>
-         <thead>
-            <tr>
-               <th>Users</th>
-            </tr>
-         </thead>
-
-         <tbody>
-            {% for user in users %}
-               <tr>
-                  <td>{{ user.username }}</td>
-               </tr>
-            {% endfor %}
-         </tbody>
-      </table>
+      
 {% endblock %}
  
