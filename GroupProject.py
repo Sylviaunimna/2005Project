@@ -76,9 +76,22 @@ class Post(db.Model):
             self.author = "Anonymous"
 
 class Subscription(db.Model):
-    """This is a placeholder doc string
+    """This Subscription class stores all the information of a user's subscriptions to topics and/or posts.
 
+    :param subID: The identification number of the subscription.
+    :param userID: The identification number of the user subscribing.
+    :param topic: The name of the topic that a user is subscribing to. (Can be None)
+    :param postID: The identificiation number of the post that a user is subscribing to.
+    :param postTitle: The title of the post that the user is subscribing to.
+    :param notification: True or False whether the subscribing user has new notification.
+    :type subID: Integer
+    :type userID: String
+    :type topic: String
+    :type postID: Integer
+    :type postTitle: String
+    :type notification: Boolean
     """
+
 
     __tablename__ = 'subscription'
     subID = db.Column('sub_id', db.Integer, primary_key=True)
@@ -96,24 +109,27 @@ class Subscription(db.Model):
             self.postTitle = Post.query.filter_by(postID=postID).first().title
         self.notification = False
 
-# class Groups(db.Model):
-#    """This is a placeholder doc string
-#
-#    """
-#
-#    __tablename__ = 'groups'
-#    groupID = db.Column('group_id', db.Integer, primary_key=True)
-#    userID = db.Column(db.String(15), db.ForeignKey('user.id'), nullable=False)
-#    group_name = db.Column('group_name', db.String(20))
-#
-#    def __init__(self, group_name, userID, groupID = 0):
-#        self.group_name = group_name
-#        self.userID = userID
-#        self.groupID = groupID
-#        if session.get('username'):
-#            self.author = session['username']
-#        else:
-#            self.author = "Anonymous"
+class Group(db.Model):
+    """This Group class stores all the information about a user created group. Including the group name, and the creator.
+
+    :param groupID: The identification number of the group.
+    :param userID: The identification number of the user referencing the group.
+    :param group_name: The name of the group, defined by the creator.
+    :type groupID: Integer
+    :type userID: Integer
+    :type group_name: String
+    """
+
+    __tablename__ = 'group'
+    groupID = db.Column('group_id', db.Integer, primary_key=True)
+    userID = db.Column(db.String(15), db.ForeignKey('user.id'), nullable=False)
+    group_name = db.Column('group_name', db.String(20))
+
+    def __init__(self, group_name, groupID = 0):
+        self.group_name = group_name
+        self.groupID = groupID
+        if session.get('username'):
+            self.userID = session['username']
 
 
 @app.route('/new', methods=['GET', 'POST'])
@@ -126,7 +142,9 @@ def new():
         if session.get('username') is None:
             flash('Error: Must be logged in to post')
         elif not request.form['title' ] or not request.form['content']:
+
             flash('Please enter all the fields', 'error')
+
         else:
             post = Post(request.form['title'], request.form['content'], request.form['topic'])
             subs = Subscription.query.filter(Subscription.topic == request.form['topic'])
@@ -223,6 +241,11 @@ def showSubs():
 
 @app.route('/topic/<topic>')
 def showTopic(topic):
+    """This is a placeholder
+
+    :param topic:
+    :return:
+    """
     return render_template('show_all.html', posts=Post.query.filter(and_(Post.replyID == 0, Post.topic == topic)))
 
 @app.route('/')
@@ -231,7 +254,7 @@ def show_all():
 
     :return: Returns the HTML template 'show_all.html'.
     """
-    return render_template('show_all.html', posts=Post.query.filter(Post.replyID == 0))
+    return render_template('show_all.html', posts=Post.query.filter(Post.replyID == 0), groups=Group.query.filter(Group.groupID == 0))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -249,7 +272,9 @@ def login():
                     session['username'] = request.form['username']
                     session['logged_in'] = True
                     flash('You were logged in as ' + session['username'])
+
                     return redirect(url_for('show_all'))
+
             else:
                 flash('Incorrect Username and/or Password')
                 return redirect(url_for('login'))
@@ -297,13 +322,53 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('show_all'))
 
-@app.route('/group')
+@app.route('/create_group', methods=['GET', 'POST'])
 def create_group():
-    """This is the stub for the create a group function.
+    """Creates a group with the defined group name, and logs the creator.
 
-    :return:
+    :return: Returns the redirect url for 'show_all.html' upon successful group creation.
     """
-    return render_template('group.html')
+
+    error = None
+    if request.method == 'POST':
+        if session.get('username') is None:
+            flash('Error: Must be logged in to create a group.')
+        if not request.form['group_name']:
+            flash('Please enter the group name.')
+            render_template('group.html')
+        else:
+            group_name = Group.query.filter_by(group_name=request.form['group_name']).first()
+            if not group_name:
+                group = Group(request.form['group_name'])
+                db.session.add(group)
+                db.session.commit()
+                flash('Group Successfully Created')
+                return redirect(url_for('show_all'))
+            else:
+                flash('Error: Group already exists')
+                return redirect(url_for('create_group'))
+    return render_template('group.html', error=error)
+
+@app.route('/join_group/<group_name>')
+def join_group(group_name):
+    """Allows a user to join a group.
+
+    :param group_name: The name of the group for the user to join.
+    :type group_name: String.
+    :return: Returns the redirect url for 'show_all.html'.
+    """
+
+    if session.get('username') is None:
+        flash('Error: Must be logged in to join a group')
+    elif Group.query.filter(and_(Group.group_name == group_name, Group.userID == session['username'])).first() is None:     #[SQL: 'INSERT INTO "group" (group_id, "userID", group_name) VALUES (?, ?, ?)'] [parameters: ('fgh', 'assd', 'assd')]  , Group.userID == session['username'] and_(Group.group_name == group_name, Group.userID == session['username'])
+        group = Group(session['username'], group_name)  #Im passing in a username here, but not accepting it in the Group() parameters. Fix this.
+        db.session.add(group)
+        db.session.commit()
+        flash(str(session['username']) + " joined the group " + group_name)
+    else:
+        flash("You're already a member of the group " + group_name)
+    return redirect(url_for('show_all'))
+
 
 db.create_all()
 if __name__ == '__main__':
