@@ -1,0 +1,19 @@
+
+{% extends "layout.html" %}
+{% block content %}
+
+      <h3>Groups (<a href = "{{ url_for('create_group') }}">Create Group
+         </a>)</h3>
+
+      <form action = "{{ request.path }}" method = "post">
+         <label for = "group_name">Group Name</label><br>
+         <input type = "text" name = "group_name" placeholder = "Group Name" /><br>
+         <input type = "submit" value = "Submit" />
+      </form>
+
+	{%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            <span style="color: red;">{{ message }}</span>
+         </div>
+      {%- endfor %}
+{% endblock %}
