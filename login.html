@@ -1,0 +1,24 @@
+
+<title>LOGIN</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+{% block body %}
+  <h2>Login</h2>
+    <p> Please login with your username and password. </p>
+
+  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+  <form action="{{ url_for('login') }}" method=post>
+  <div>
+      <label for=text>Username</label>:
+      <input type=text name=username placeholder="Username..">
+      <label for=password>Password</label>:
+      <input type=password name=password placeholder="Password..">
+      <input type=submit value=Login>
+  </div>
+
+  </form>
+        <p>Don't have an account? <a href = "{{ url_for('register') }}">Register   </a></p>
+
+
+            <p><a href = "{{ url_for('show_all') }}">Home Page</a><br><br><br></p>
+{% endblock %}

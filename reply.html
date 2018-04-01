@@ -1,0 +1,36 @@
+<title>REPLY</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+{% block content %}
+
+
+      <table border="1">
+         <thead>
+            <tr>
+               <th>Author</th>
+               <th>Content</th>
+            </tr>
+         </thead>
+
+         <tbody>
+            {% for post in posts %}
+               <tr>
+                  <td>{{ post.author }}</td>
+                  <td>{{ post.content }}</td>
+               </tr>
+            {% endfor %}
+
+
+         </tbody>
+      </table>
+
+      <form action = "{{ request.path }}" method = "post">
+         <label for = "content">Content</label><br>
+         <input type = "text" name = "content" placeholder = "Post Content" /><br>
+         <input type = "submit" value = "Submit" />
+      </form>
+	{%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            <span style="color: red;">{{ message }}</span>
+         </div>
+      {%- endfor %}
+{% endblock %}

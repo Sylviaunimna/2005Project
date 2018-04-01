@@ -1,0 +1,37 @@
+<title>HOME PAGE</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<html lang = "en">
+	<div class="header">
+     <h1>COMP-2005 Project</h1>
+    <p>Welcome to the home page.</p>
+    </div>
+
+   <body>
+	<div>
+		{% if not session.logged_in %}
+            <h3>
+             <a href = "{{ url_for('login') }}">Login  </a>
+            </h3>
+            <h3>
+            <a href = "{{ url_for('register') }}">Register   </a>
+            </h3>
+		{% endif %}
+		{% if session.logged_in %}
+            <h3>
+			    <a href="/logout">Log out</a>
+            </h3>
+		{% endif %}
+            <h3>
+                <a href="/group">Group discussion</a>
+            </h3>
+
+		{% if session.logged_in %}
+            <h3>
+			    <a href="/mysubs">My Subscriptions</a>
+            </h3>
+		{% endif %}		
+    </div>
+	{% block content %} {% endblock %}
+  </body>
+</html>
+

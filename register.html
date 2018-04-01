@@ -1,0 +1,30 @@
+<title>REGISTER</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+{% block body %}
+  <h2>Register</h2>
+    <p> Let's get started. </p>
+
+  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+  <form action="{{ url_for('register') }}" method=post>
+  <div>
+      <label for=text>New Username</label>:
+      <input type=text name=username placeholder="New Username..">
+      <label for=password>Create a password</label>:
+      <input type=text name=password placeholder="Create a Password..">
+      <label for=password>Confirm your password</label>:
+      <input type=text name=password>
+      <input type=submit value=Register>
+  </div>
+
+  </form>
+
+    <p>Already have an account? <a href = "{{ url_for('login') }}">Login     </a></p>
+
+
+            <p><a href = "{{ url_for('show_all') }}">Home Page</a><br><br><br></p>
+
+{% endblock %}
+
+
+</html>

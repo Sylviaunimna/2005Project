@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+      <hr/>
+      {%- for message in get_flashed_messages() %}
+         {{ message }}
+      {%- endfor %}
+
+      <h3>Posts (<a href = "{{ url_for('new') }}">Add Post</a>)</h3>
+
+     <table border="1">
+         <thead>
+            <tr>
+               <th>Title</th>
+               <th>Author</th>
+               <th>Content</th>
+               <th>Topic</th>
+            </tr>
+         </thead>
+
+         <tbody>
+            {% for post in posts %}
+               <tr>
+                  <td>{{ post.title }}</td>
+                  <td>{{ post.author }}</td>
+                  <td>{{ post.content }}</td>
+                    <td><a href = {{ url_for('showTopic', topic = post.topic) }}> {{ post.topic }} </a></td>
+                  <td><a href = {{ url_for('replyto', post_id = post.postID) }}> Replies ({{ post.replies }}) </a></td>
+                   <td><a href = {{ url_for('subscribetotopic', topic = post.topic) }}>Subscribe to Topic</a></td>
+                   <td><a href = {{ url_for('subscribetopost', post_id = post.postID) }}>Subscribe to Post</a></td>
+               </tr>
+            {% endfor %}
+
+         </tbody>
+      </table>
+
+
+
+{% endblock %}
+ 
+

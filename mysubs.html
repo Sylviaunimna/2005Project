@@ -1,0 +1,44 @@
+
+{% block content %}
+	<h3>My subscription</h3>
+
+
+      <table border="1">
+         <thead>
+            <tr>
+               <th>My Subscribed Topics</th>
+                <th>New Posts</th>
+            </tr>
+         </thead>
+
+         <tbody>
+            {% for sub1 in subTopics %}
+               <tr>
+               <td><a href = {{ url_for('showTopic', topic = sub1.topic) }}>{{  sub1.topic  }}</a></td>
+               <td>{{  sub1.notification  }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+
+      <table border="1">
+         <thead>
+            <tr>
+               <th>My Subscribed Posts</th>
+                <th>New Posts</th>
+            </tr>
+         </thead>
+
+         <tbody>
+            {% for sub2 in subPosts %}
+               <tr>
+               <td><a href = {{ url_for('replyto', post_id = sub2.postID) }}>{{  sub2.postTitle  }}</a></td>
+               <td>{{  sub2.notification  }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+
+
+{% endblock %}
+

@@ -1,0 +1,24 @@
+<title>NEW POST</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+
+{% block content %}
+  <h2>New Post</h2>
+      <form action = "{{ request.path }}" method = "post">
+         <label for = "title">Post Title</label><br>
+         <input type = "text" name = "title" placeholder = "Post Title" /><br>
+         <label for = "content">Content</label><br>
+         <input type = "text" name = "content" placeholder = "Post Content" /><br>
+         <label for = "topic">Topic</label><br>
+         <input type = "text" name = "topic" placeholder = "General" /><br>
+         <input type = "submit" value = "Submit" />
+      </form>
+
+	{%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            <span style="color: red;">{{ message }}</span>
+         </div>
+      {%- endfor %}
+
+            <a href = "{{ url_for('show_all') }}">Back to Home Page</a><br><br><br>
+
+{% endblock %}
